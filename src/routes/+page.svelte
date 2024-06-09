@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let code: string = $state(`puts "Hello, world!"\nputs 1.upto(5).map { |n| n * 2 }.join(", ")`);
+	let code: string = $state(`puts "Hello, world!"
+puts 1.upto(5).map { |n| n * 2 }.join(", ")
+
+require "date"
+now = DateTime.now.new_offset('${getTimezoneOffset()}')
+puts now.strftime("%H:%M:%S.%L")
+  `);
 	let loaded: boolean = $state(false);
 	let logs: string[] = $state([]);
 	let output = $derived(logs.join(''));
@@ -21,6 +27,16 @@
 		if (e.key === 'Enter' && e.metaKey) {
 			run(e);
 		}
+	}
+
+	function getTimezoneOffset() {
+		const offset = new Date().getTimezoneOffset();
+		const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
+		const minutes = String(Math.abs(offset) % 60).padStart(2, '0');
+		const sign = offset <= 0 ? '+' : '-';
+		const offsetString = `${sign}${hours}:${minutes}`;
+
+		return offsetString;
 	}
 
 	onMount(async () => {
